@@ -216,6 +216,11 @@ Why the performance become worse?
 
     LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
 
+#### Convert_hf_to_gguf.py Issue
+This script is designed to convert Hugging Face (HF) models to GGUF format, typically targeting causal language models (CLMs) like LlamaForCausalLM. However, classification models like LlamaForSequenceClassification have architectural and functional differences that the script might not account for.
+
+To solve this problem, we already changed the model to AutomodelforcausalLM. We managed to convert the new fine-tuned model into GGUF outtype.  
+
 #### Conclusion
 1. The number of epochs affects how well the model learns from the training data; too few epochs can lead to underfitting, while too many may result in overfitting, harming generalization to unseen data. 
 
