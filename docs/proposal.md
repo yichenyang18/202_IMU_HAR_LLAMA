@@ -123,7 +123,10 @@ Broad Impact:
 
 ### 9.a. Papers
 
-List the key papers that you have identified relating to your project idea, and describe how they related to your project. Provide references (with full citation in the References section below).
+1. An, Tuo, et al. IoT-LLM: Enhancing Real-World IoT Task Reasoning with 
+Large Language Models.
+
+2. Ji, Sijie, et al. HARGPT: Are LLMs Zero-Shot Human Activity Recognizers?
 
 ### 9.b. Datasets
 
@@ -135,4 +138,8 @@ Jupyternotebook, Ollama
 
 ## 10. References
 
-List references correspondign to citations in your text above. For papers please include full citation and URL. For datasets and software include name and URL.
+1. An, Tuo, et al. IoT-LLM: Enhancing Real-World IoT Task Reasoning with 
+Large Language Models. arXiv:2410.02429, arXiv, 4 Oct. 2024. arXiv.org, 
+https://doi.org/10.48550/arXiv.2410.02429.
+2. Ji, Sijie, et al. HARGPT: Are LLMs Zero-Shot Human Activity Recognizers? 
+arXiv:2403.02727, arXiv, 5 Mar. 2024. arXiv.org, https://doi.org/10.48550/arXiv.2403.02727.
