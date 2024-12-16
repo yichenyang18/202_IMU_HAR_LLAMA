@@ -216,6 +216,22 @@ Why the performance become worse?
 
     LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
 
+#### Convert_hf_to_gguf.py Issue
+This script is designed to convert Hugging Face (HF) models to GGUF format, typically targeting causal language models (CLMs) like LlamaForCausalLM. However, classification models like LlamaForSequenceClassification have architectural and functional differences that the script might not account for.
+
+To solve this problem, we already changed the model to AutomodelforcausalLM. We managed to convert the new fine-tuned model into GGUF outtype.  
+
+#### Conclusion
+1. The number of epochs affects how well the model learns from the training data; too few epochs can lead to underfitting, while too many may result in overfitting, harming generalization to unseen data. 
+
+2. The dataset size is equally important—larger datasets provide more diverse examples for the model to learn patterns.
+
+3. The data presentation plays a significant role; clear, consistent formatting and well-structured inputs allow the model to better extract relevant features, while noisy or unstructured data can confuse the learning process. 
+
+4. The domain knowledge can enhance performance if it is relevant and well-integrated, but excessive or poorly contextualized domain information can overwhelm the model, leading to reduced accuracy. 
+
+5. The choice of base model establishes the starting point for fine-tuning; pretrained models with architectures and training objectives aligned to the task are more likely to yield higher accuracy compared to mismatched or less capable models.
+
 
 ### Performance test on smartphone
 The objective of this part is to explore techniques for augmenting LLM's capability to perform HAR tasks on edge device 
