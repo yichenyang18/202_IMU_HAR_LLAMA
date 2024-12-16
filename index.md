@@ -1,5 +1,5 @@
 # 202 Project: IMU-based LLMs HAR Performance on Edge Device
-
+[Github repo](https://github.com/yichenyang18/202_IMU_HAR_LLAMA)
 ## Table of Contents
 1. [Abstract](#abstract)
 2. [Introduction](#introduction)
@@ -216,17 +216,6 @@ Why the performance become worse?
 
     LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
 
-#### Conclusion
-1. The number of epochs affects how well the model learns from the training data; too few epochs can lead to underfitting, while too many may result in overfitting, harming generalization to unseen data. 
-
-2. The dataset size is equally important—larger datasets provide more diverse examples for the model to learn patterns.
-
-3. The data presentation plays a significant role; clear, consistent formatting and well-structured inputs allow the model to better extract relevant features, while noisy or unstructured data can confuse the learning process. 
-
-4. The domain knowledge can enhance performance if it is relevant and well-integrated, but excessive or poorly contextualized domain information can overwhelm the model, leading to reduced accuracy. 
-
-5. The choice of base model establishes the starting point for fine-tuning; pretrained models with architectures and training objectives aligned to the task are more likely to yield higher accuracy compared to mismatched or less capable models.
-
 
 ### Performance test on smartphone
 The objective of this part is to explore techniques for augmenting LLM's capability to perform HAR tasks on edge device 
@@ -341,7 +330,7 @@ for tasks like classification. Below is the signal processing workflow:
 ## Evaluation and Results
 
 ### Model fine-tuning
-[NEED TO COMPLETE]
+See the above explanation in [Technical Approach](#technical-approach). 
 
 ### Performance test on smartphone
 #### Baseline
@@ -395,6 +384,21 @@ surges.
 We believe that the reason behind this phenomenon is that ss the input complexity increases, the model may struggle to determine which parts of the 
 input are critical for the task, resulting in little or no improvement in accuracy.
 
+#### Data augmentation 2
+![](./src/da2_acc.png)
+![](./src/da2_td.png)
+![](./src/da2_pec.png)
+![](./src/da2_ped.png)
+![](./src/da2_per.png)
+![](./src/da2_ec.png)
+![](./src/da2_ed.png)
+![](./src/da2_er.png)
+
+Denoising input data and providing the LLM with frequency domain features generally results similarly as what we did in prompt configuration. However, the total 
+duration/latency is greatly increased. We can possibly conclude that increasing information entropy in the input prompts may not be efficient as custimization, 
+as the processing duration generally increments more. 
+
+
 #### Memory usage
 <img src="./src/memory_usage.jpg" width="500" />
 
@@ -415,7 +419,24 @@ Model Memory Status:
   - Partial graph: 570.7 MiB
 
 ## Discussions and Conclusions
-[NEED TO COMPLETE]
+### Conclusion from fine-tuning LLMs
+1. The number of epochs affects how well the model learns from the training data; too few epochs can lead to underfitting, while too many may result in overfitting, harming generalization to unseen data. 
+
+2. The dataset size is equally important—larger datasets provide more diverse examples for the model to learn patterns.
+
+3. The data presentation plays a significant role; clear, consistent formatting and well-structured inputs allow the model to better extract relevant features, while noisy or unstructured data can confuse the learning process. 
+
+4. The domain knowledge can enhance performance if it is relevant and well-integrated, but excessive or poorly contextualized domain information can overwhelm the model, leading to reduced accuracy. 
+
+5. The choice of base model establishes the starting point for fine-tuning; pretrained models with architectures and training objectives aligned to the task are more likely to yield higher accuracy compared to mismatched or less capable models.
+
+### Conclusion from performance test on edge devices
+1. Generally speaking, providing LLMs with more background knowledge, including the physical meaning of data, the background of the task, a few samples, or the statistical features of data, will help increase the 
+reasoning and logic of the models.
+
+2. However, giving too much information/features will result in a better performance, while the prompt evaluation duration will highly increase, leading a large latency. The better way is to customize the model first and then feed with a proper amount of data.
+
+3. The future direction for this project would be training LoRA adapters for extent LLMs like Llama3.2, which can theoretically increase the performance while maintaining a reasonable latency and memory usage.
 
 
 ## References
