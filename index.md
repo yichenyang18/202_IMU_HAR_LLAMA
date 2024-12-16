@@ -60,7 +60,173 @@ real world while addressing the challenges associated with deploying them on edg
 ## Technical Approach
 
 ### Model fine-tuning
-[NEED TO COMPLETE]
+#### Baseline 
+For accuracy performance, we set the baseline using the Llama 3.2 1B model with a training dataset size of 1800 samples. For both accelerometer and gyrometer data in the x, y, and z directions, we provided only the first value. For the text input, we specified only what the number represents.
+
+Dataset (1800 samples):
+
+![](./src/Llama%20baseline.png)
+
+Text Input:
+
+“body_acc_x: 1.808515, body_acc_y: 1.076681, body_acc_z: 5.556068; body_gyro_x: 6.601362, body_gyro_y: 6.601362, body_gyro_z: 2.285864; total_acc_x: 1.012817, total_acc_y: -1.232167, total_acc_z: 1.029341”
+
+Number of Epoch: 3
+
+Validation Accuracy: 35.28%
+
+![](./src/Llama%20baseline%20result.png)
+
+#### Base Model Change
+Following tests with the Llama 3.2 1B model, we experimented with the 3B model, which has more parameters. We anticipated that the more complex model would yield better performance in Human Activity Recognition (HAR). Using the same inputs and dataset, we fine-tuned the 3B model on Google Colab Pro with an A100 GPU.
+
+Dataset (1800 samples):
+
+![](./src/Llama%20baseline.png)
+
+Text Input:
+
+“body_acc_x: 1.808515, body_acc_y: 1.076681, body_acc_z: 5.556068; body_gyro_x: 6.601362, body_gyro_y: 6.601362, body_gyro_z: 2.285864; total_acc_x: 1.012817, total_acc_y: -1.232167, total_acc_z: 1.029341”
+
+Number of Epoch: 3
+
+Validation Accuracy: >35.28%
+
+Due to the 3B model size, I had to run the fine tune task on Google Colab pro with A1000 GPU. However, it disconnected after 7h. It finished the first 2 epoch. For the record, we got much lower training losses that are around 1.9 and 1.4. We estimated that the validation accuracy will be higher and better.
+
+#### Dataset Change
+Continuing with the Llama 3.2 1B model, we reduced the dataset size to 600 samples. Instead of providing a single value for x, y, and z accelerometer and gyrometer data, we provided a list containing three values. All other parameters remained unchanged.
+
+Dataset (600 samples):
+
+![](./src/Llamabasemodeldataset.png)
+
+Text Input:
+
+“The data is measured and collected in 2.56s. body_acc_x: [list], body_acc_y: [list], body_acc_z: [list];
+body_gyro_x: [list], body_gyro_y: [list], body_gyro_z: [list]; total_acc_x: [list], total_acc_y: [list], total_acc_z: [list]
+Based on these numbers, classify what the person is doing during 2.56s?”
+
+Number of Epoch: 3
+
+Validation Accuracy: 20.83%
+
+![](./src/Llamabasemodelresult.png)
+
+#### Casual Model Change
+After resolving an issue with convert_hf_to_gguf.py, we defined a custom LlamaForSequenceClassification class and fine-tuned the model using a causal language model (LLM) as the base.
+
+Same Dataset and text input
+
+Changing LlamaForSequenceClassification to Causal LLM
+
+![](./src/Llamacasualmodel2.png)
+
+![](./src/Llamacasualmodel.png)
+
+LlamaForSequenceClassification is fine-tuned specifically for sequence classification tasks, where the model learns to map an entire input sequence to a single class label. Causal LLMs is trained for causal language modeling, where the model predicts the next token in a sequence based on preceding tokens. The causal LLM performs worse because it is not inherently designed for classification tasks. For classification tasks, using a specialized model is preferable.
+
+Number of Epoch: 3
+
+Validation Accuracy: 17.50%
+
+![](./src/Llamacasualmodelresult.png)
+
+#### Number of Epoch Change
+The same model we used in last page.
+
+Same text input format.
+
+Same dataset.
+
+![](./src/Llama5epoch.png)
+
+We increase the number of epoch to 5.
+
+We can see the accuracy improves a lot.
+
+Number of Epoch: 5
+
+Validation Accuracy: 29.17%
+
+However, keep increasing the number of epoch does not always increase the validation accuracy. During training, the model learns patterns from the training data. With too many epochs, it begins to "memorize" the training data, including noise and specific details that don't generalize well to unseen data.
+The training accuracy may continue to improve, but the validation accuracy will stagnate or even decrease as the model becomes overfit and loses its ability to generalize. When I increase the number of epoch to 10, the training loss goes to 0, which shows that the model is overfitting.
+
+#### Data Presentation
+Dataset (600 samples):
+
+![](./src/Llamascience.png)
+
+Same text Input, but we use scientific notation instead of float. 
+
+![](./src/Llamascienceresult.png)
+
+Number of Epoch: 5
+
+Validation Accuracy: 36.67%
+
+This result suggests that scientific notation may enhance LLM fine-tuning for tasks involving large or small numerical values, precision-critical requirements, or token efficiency constraints.
+
+#### Domain Knowledge
+Additionally, we incorporated domain knowledge into the LLM following fine-tuning techniques from a referenced paper. However, this approach did not yield the expected results.
+
+Message we added:
+
+Using accelerometer and gyroscope data recorded along the x, y, and z axes, classify the activity being performed as one of the following: Walking, Walking Upstairs, Walking Downstairs, Sitting, Standing, or Laying. 
+
+Each activity exhibits distinct motion patterns:
+
+Walking: Moderate, periodic accelerations and angular velocities in all directions.
+
+Walking Upstairs: Increased vertical motion (z-axis) compared to walking.
+
+Walking Downstairs: Irregular, high vertical impacts (z-axis).
+
+Sitting: Minimal acceleration and angular velocity, near-static.
+
+Standing: Similar to sitting, but with potential minor shifts.
+
+Laying: Negligible motion, consistent low values across all axes.
+
+The data has been segmented into 2.56-second windows, with each window characterized by extracted features
+
+like mean, variance, and frequency-domain properties. Use these patterns to identify the activity.
+
+![](./src/Llamadkresult.png)
+
+Number of Epoch: 5
+
+Validation Accuracy: 25.00%
+
+Why the performance become worse?
+
+1. Increased Input Complexity
+
+    Adding domain knowledge increases the input's length and complexity. The model may struggle to identify which parts of the input are critical for classification, leading to worse performance.
+
+2. Misalignment of Domain Knowledge with Model Understanding
+
+    If the provided domain knowledge is not formatted or structured in a way that aligns with the LLM's training data or architecture, the model might misinterpret it.
+
+3. Distracting or Conflicting Information
+
+    Domain knowledge can introduce information that: Conflicts with the patterns learned by the model. Distracts from the core features needed for classification.
+
+4. Overloading the Model's Context Window
+
+    LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
+
+#### Conclusion
+1. The number of epochs affects how well the model learns from the training data; too few epochs can lead to underfitting, while too many may result in overfitting, harming generalization to unseen data. 
+
+2. The dataset size is equally important—larger datasets provide more diverse examples for the model to learn patterns.
+
+3. The data presentation plays a significant role; clear, consistent formatting and well-structured inputs allow the model to better extract relevant features, while noisy or unstructured data can confuse the learning process. 
+
+4. The domain knowledge can enhance performance if it is relevant and well-integrated, but excessive or poorly contextualized domain information can overwhelm the model, leading to reduced accuracy. 
+
+5. The choice of base model establishes the starting point for fine-tuning; pretrained models with architectures and training objectives aligned to the task are more likely to yield higher accuracy compared to mismatched or less capable models.
+
 
 ### Performance test on smartphone
 The objective of this part is to explore techniques for augmenting LLM's capability to perform HAR tasks on edge device 
