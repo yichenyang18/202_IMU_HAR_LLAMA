@@ -232,6 +232,15 @@ Why the performance become worse?
 
     LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
 
+Based on the these conslusions, we improve the input domain knowledge again.
+
+![](./src/Llamadk2.png)
+
+![](./src/Llamadk3.png)
+
+We delete some useless information in the domain knowledge, create a clearier connection between the label and the activity, and give tokenize function a bigger max_length value. 
+
+This test is based on the Llama 3.2 1B 5 epoch model, we can see the accuray improves from 29.17% to 33.33%.
 
 ### Performance test on smartphone
 The objective of this part is to explore techniques for augmenting LLM's capability to perform HAR tasks on edge device 
