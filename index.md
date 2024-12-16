@@ -216,6 +216,16 @@ Why the performance become worse?
 
     LLMs have a fixed context window size. If the domain knowledge plus input data exceeds this limit, older or truncated parts of the input might be ignored.
 
+Based on the these conslusions, we improve the input domain knowledge again.
+
+![](./src/Llamadk2.png)
+
+![](./src/Llamadk3.png)
+
+We delete some useless information in the domain knowledge, create a clearier connection between the label and the activity, and give tokenize function a bigger max_length value. 
+
+This test is based on the Llama 3.2 1B 5 epoch model, we can see the accuray improves from 29.17% to 33.33%.
+
 #### Convert_hf_to_gguf.py Issue
 This script is designed to convert Hugging Face (HF) models to GGUF format, typically targeting causal language models (CLMs) like LlamaForCausalLM. However, classification models like LlamaForSequenceClassification have architectural and functional differences that the script might not account for.
 
